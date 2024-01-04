@@ -118,7 +118,6 @@ export const encrypt = function encrypt(actionFunction, salt = "", index = 1, en
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     args[index] = encrypter(args[index], salt, ...options);
-    console.log(args[index]);
     return actionFunction(...args);
   };
 }
@@ -128,7 +127,6 @@ export const decrypt = function decrypt(actionFunction, salt = "", index = 1, de
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     let data = actionFunction(...args);
     args[index] = decrypter(data, salt, ...options);
-    console.log(args[index]);
     return args[index];
   };
 }
