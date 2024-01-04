@@ -1,0 +1,145 @@
+/**
+ * 
+ * Package: 
+ * Author: Ganesh B
+ * Description: 
+ * Install: npm i  --save
+ * Github: https://github.com/ganeshkbhat/
+ * npmjs Link: https://www.npmjs.com/package/
+ * File: index.js
+ * File Description: 
+ * 
+*/
+
+/* eslint no-console: 0 */
+
+'use strict';
+
+import { hashContent, dehashContent } from "hasher-apis";
+import crypto from "node:crypto";
+
+
+const ALGORITHM = {
+
+  /**
+   * GCM is an authenticated encryption mode that
+   * not only provides confidentiality but also 
+   * provides integrity in a secured way
+   * */
+  BLOCK_CIPHER: 'aes-256-gcm',
+
+  /**
+   * 128 bit auth tag is recommended for GCM
+   */
+  AUTH_TAG_BYTE_LEN: 16,
+
+  /**
+   * NIST recommends 96 bits or 12 bytes IV for GCM
+   * to promote interoperability, efficiency, and
+   * simplicity of design
+   */
+  IV_BYTE_LEN: 12,
+
+  /**
+   * Note: 256 (in algorithm name) is key size. 
+   * Block size for AES is always 128
+   */
+  KEY_BYTE_LEN: 32,
+
+  /**
+   * To prevent rainbow table attacks
+   * */
+  SALT_BYTE_LEN: 16
+}
+
+const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
+exports.getRandomKey = getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
+
+/**
+ * To prevent rainbow table attacks
+ * */
+exports.getSalt = getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
+
+/**
+ * 
+ * @param {Buffer} password - The password to be used for generating key
+ * 
+ * To be used when key needs to be generated based on password.
+ * The caller of this function has the responsibility to clear 
+ * the Buffer after the key generation to prevent the password 
+ * from lingering in the memory
+ */
+exports.getKeyFromPassword = getKeyFromPassword = (password, salt) => {
+  return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
+}
+
+/**
+ * 
+ * @param {Buffer} messagetext - The clear text message to be encrypted
+ * @param {Buffer} key - The key to be used for encryption
+ * 
+ * The caller of this function has the responsibility to clear 
+ * the Buffer after the encryption to prevent the message text 
+ * and the key from lingering in the memory
+ */
+exports.cryptoencrypt = cryptoencrypt = (messagetext, key) => {
+  const iv = getIV();
+  const cipher = crypto.createCipheriv(
+    ALGORITHM.BLOCK_CIPHER, key, iv,
+    { 'authTagLength': ALGORITHM.AUTH_TAG_BYTE_LEN });
+  let encryptedMessage = cipher.update(messagetext);
+  encryptedMessage = Buffer.concat([encryptedMessage, cipher.final()]);
+  return Buffer.concat([iv, encryptedMessage, cipher.getAuthTag()]);
+}
+
+/**
+ * 
+ * @param {Buffer} ciphertext - Cipher text
+ * @param {Buffer} key - The key to be used for decryption
+ * 
+ * The caller of this function has the responsibility to clear 
+ * the Buffer after the decryption to prevent the message text 
+ * and the key from lingering in the memory
+ */
+exports.cryptodecrypt = cryptodecrypt = (ciphertext, key) => {
+  const authTag = ciphertext.slice(-16);
+  const iv = ciphertext.slice(0, 12);
+  const encryptedMessage = ciphertext.slice(12, -16);
+  const decipher = crypto.createDecipheriv(
+    ALGORITHM.BLOCK_CIPHER, key, iv,
+    { 'authTagLength': ALGORITHM.AUTH_TAG_BYTE_LEN });
+  decipher.setAuthTag(authTag);
+  let messagetext = decipher.update(encryptedMessage);
+  messagetext = Buffer.concat([messagetext, decipher.final()]);
+  return messagetext;
+}
+
+export const encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = hashContent) {
+  return function (...args) {
+    args[1] = encrypter(args[index], salt, "aes-256-ctr", "sha256", "base64", { logger: console.log });
+    return actionFunction(...args);
+  };
+}
+
+export const decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = dehashContent) {
+  return function (...args) {
+    let data = actionFunction(...args);
+    args[index] = decrypter(...args) || dehashContent(data, salt, "aes-256-ctr", "sha256", "base64", { logger: console.log });
+    return args[index];
+  };
+}
+
+export const encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = hashContent) {
+  return (...args) => actionFunction(...args).map(v => encrypter(v, salt));
+}
+
+export const decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = dehashContent) {
+  return (...args) => actionFunction(...args).map(v => decrypter(v, salt));
+}
+
+export default {
+  encrypt,
+  decrypt,
+  encryptRecursive,
+  decryptRecursive
+}

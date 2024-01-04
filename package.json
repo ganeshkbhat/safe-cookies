@@ -1,0 +1,23 @@
+{
+  "devDependencies": {
+    "chai": "^5.0.0",
+    "esm": "^3.2.25",
+    "mocha": "^10.2.0",
+    "react-cookie": "^7.0.0",
+    "react-cookies": "^0.1.1"
+  },
+  "name": "safe-cookies",
+  "description": "Wrap most of the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha --reporter spec --require esm --recursive --timeout 60000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "hasher-apis": "^0.2.7"
+  }
+}
