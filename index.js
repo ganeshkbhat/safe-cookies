@@ -53,12 +53,12 @@ const ALGORITHM = {
 }
 
 const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
-exports.getRandomKey = getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
+export const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
 
 /**
  * To prevent rainbow table attacks
  * */
-exports.getSalt = getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
+export const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
 
 /**
  * 
@@ -69,7 +69,7 @@ exports.getSalt = getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
  * the Buffer after the key generation to prevent the password 
  * from lingering in the memory
  */
-exports.getKeyFromPassword = getKeyFromPassword = (password, salt) => {
+export const getKeyFromPassword = (password, salt) => {
   return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
 }
 
@@ -82,7 +82,7 @@ exports.getKeyFromPassword = getKeyFromPassword = (password, salt) => {
  * the Buffer after the encryption to prevent the message text 
  * and the key from lingering in the memory
  */
-exports.cryptoencrypt = cryptoencrypt = (messagetext, key) => {
+export const cryptoencrypt = (messagetext, key) => {
   const iv = getIV();
   const cipher = crypto.createCipheriv(
     ALGORITHM.BLOCK_CIPHER, key, iv,
@@ -101,7 +101,7 @@ exports.cryptoencrypt = cryptoencrypt = (messagetext, key) => {
  * the Buffer after the decryption to prevent the message text 
  * and the key from lingering in the memory
  */
-exports.cryptodecrypt = cryptodecrypt = (ciphertext, key) => {
+export const cryptodecrypt = (ciphertext, key) => {
   const authTag = ciphertext.slice(-16);
   const iv = ciphertext.slice(0, 12);
   const encryptedMessage = ciphertext.slice(12, -16);
@@ -116,15 +116,19 @@ exports.cryptodecrypt = cryptodecrypt = (ciphertext, key) => {
 
 export const encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
   return function (...args) {
-    args[1] = encrypter(args[index], salt, "aes-256-ctr", "sha256", "base64", { logger: console.log });
+    let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
+    args[index] = encrypter(args[index], salt, ...options);
+    console.log(args[index]);
     return actionFunction(...args);
   };
 }
 
 export const decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
   return function (...args) {
+    let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     let data = actionFunction(...args);
-    args[index] = decrypter(...args) || dehashContent(data, salt, "aes-256-ctr", "sha256", "base64", { logger: console.log });
+    args[index] = decrypter(data, salt, ...options);
+    console.log(args[index]);
     return args[index];
   };
 }
