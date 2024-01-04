@@ -114,14 +114,14 @@ exports.cryptodecrypt = cryptodecrypt = (ciphertext, key) => {
   return messagetext;
 }
 
-export const encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = hashContent) {
+export const encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
   return function (...args) {
     args[1] = encrypter(args[index], salt, "aes-256-ctr", "sha256", "base64", { logger: console.log });
     return actionFunction(...args);
   };
 }
 
-export const decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = dehashContent) {
+export const decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
   return function (...args) {
     let data = actionFunction(...args);
     args[index] = decrypter(...args) || dehashContent(data, salt, "aes-256-ctr", "sha256", "base64", { logger: console.log });
@@ -129,11 +129,11 @@ export const decrypt = function decrypt(actionFunction, salt = "", index = 1, de
   };
 }
 
-export const encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = hashContent) {
+export const encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
   return (...args) => actionFunction(...args).map(v => encrypter(v, salt));
 }
 
-export const decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = dehashContent) {
+export const decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
   return (...args) => actionFunction(...args).map(v => decrypter(v, salt));
 }
 
