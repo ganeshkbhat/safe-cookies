@@ -15,10 +15,23 @@
 
 'use strict';
 
-import { hashContent, dehashContent } from "hasher-apis";
 import crypto from "node:crypto";
 
+// function decrypt_string(encryptedMessage, encryptionMethod, secret, iv) {
+//   const buff = Buffer.from(encryptedMessage, 'base64');
+//   encryptedMessage = buff.toString('utf-8');
+//   var decryptor = Crypto.createDecipheriv(encryptionMethod, secret, iv);
+//   return decryptor.update(encryptedMessage, 'base64', 'utf8') + decryptor.final('utf8');
+// };
 
+// function decrypt_string(encryptedMessage, encryptionMethod, secret, iv) {
+//   const buff = Buffer.from(encryptedMessage, 'base64');
+//   encryptedMessage = buff.toString('utf-8');
+//   var decryptor = Crypto.createDecipheriv(encryptionMethod, secret, iv);
+//   return decryptor.update(encryptedMessage, 'base64', 'utf8') + decryptor.final('utf8');
+// };
+
+/** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
 const ALGORITHM = {
 
   /**
@@ -52,36 +65,55 @@ const ALGORITHM = {
   SALT_BYTE_LEN: 16
 }
 
-const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
-export const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
-
 /**
- * To prevent rainbow table attacks
- * */
-export const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
-
-/**
+ *
+ * getIV
  * 
- * @param {Buffer} password - The password to be used for generating key
- * 
- * To be used when key needs to be generated based on password.
- * The caller of this function has the responsibility to clear 
- * the Buffer after the key generation to prevent the password 
- * from lingering in the memory
+ * Function to get a IV value using a standard IV byte length
+ *
  */
+const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
+
+/**
+ * getRandomKey
+ * 
+ * Function to get a Key for a Crypto.CipherIV key
+ *
+ */
+const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
+
+/**
+ * 
+ * getSalt
+ * 
+ * Function to get a salt of specific byte length 
+ * 
+ * To prevent rainbow table attacks
+ */
+const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
+
+/**
+* 
+* @param {Buffer} password - The password to be used for generating key
+* 
+* To be used when key needs to be generated based on password.
+* The caller of this function has the responsibility to clear 
+* the Buffer after the key generation to prevent the password 
+* from lingering in the memory
+*/
 export const getKeyFromPassword = (password, salt) => {
   return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
 }
 
 /**
- * 
- * @param {Buffer} messagetext - The clear text message to be encrypted
- * @param {Buffer} key - The key to be used for encryption
- * 
- * The caller of this function has the responsibility to clear 
- * the Buffer after the encryption to prevent the message text 
- * and the key from lingering in the memory
- */
+* 
+* @param {Buffer} messagetext - The clear text message to be encrypted
+* @param {Buffer} key - The key to be used for encryption
+* 
+* The caller of this function has the responsibility to clear 
+* the Buffer after the encryption to prevent the message text 
+* and the key from lingering in the memory
+*/
 export const cryptoencrypt = (messagetext, key) => {
   const iv = getIV();
   const cipher = crypto.createCipheriv(
@@ -93,14 +125,14 @@ export const cryptoencrypt = (messagetext, key) => {
 }
 
 /**
- * 
- * @param {Buffer} ciphertext - Cipher text
- * @param {Buffer} key - The key to be used for decryption
- * 
- * The caller of this function has the responsibility to clear 
- * the Buffer after the decryption to prevent the message text 
- * and the key from lingering in the memory
- */
+* 
+* @param {Buffer} ciphertext - Cipher text
+* @param {Buffer} key - The key to be used for decryption
+* 
+* The caller of this function has the responsibility to clear 
+* the Buffer after the decryption to prevent the message text 
+* and the key from lingering in the memory
+*/
 export const cryptodecrypt = (ciphertext, key) => {
   const authTag = ciphertext.slice(-16);
   const iv = ciphertext.slice(0, 12);
@@ -114,6 +146,15 @@ export const cryptodecrypt = (ciphertext, key) => {
   return messagetext;
 }
 
+/**
+ *
+ *
+ * @param {*} actionFunction
+ * @param {string} [salt=""]
+ * @param {number} [index=1] Value is the messagetext to be encryptedand decrypted. Use the index of value as the index property's value
+ * @param {*} [encrypter=cryptoencrypt]
+ * @return {*} 
+ */
 export const encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
@@ -122,6 +163,15 @@ export const encrypt = function encrypt(actionFunction, salt = "", index = 1, en
   };
 }
 
+/**
+ *
+ *
+ * @param {*} actionFunction
+ * @param {string} [salt=""]
+ * @param {number} [index=1] Value is the messagetext to be encryptedand decrypted. Use the index of value as the index property's value
+ * @param {*} [decrypter=cryptodecrypt]
+ * @return {*} 
+ */
 export const decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
@@ -131,10 +181,26 @@ export const decrypt = function decrypt(actionFunction, salt = "", index = 1, de
   };
 }
 
+/**
+ *
+ *
+ * @param {*} actionFunction
+ * @param {string} [salt=""]
+ * @param {*} [encrypter=cryptoencrypt]
+ * @return {*} 
+ */
 export const encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
   return (...args) => actionFunction(...args).map(v => encrypter(v, salt));
 }
 
+/**
+ *
+ *
+ * @param {*} actionFunction
+ * @param {string} [salt=""]
+ * @param {*} [decrypter=cryptodecrypt]
+ * @return {*} 
+ */
 export const decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
   return (...args) => actionFunction(...args).map(v => decrypter(v, salt));
 }
@@ -142,6 +208,11 @@ export const decryptRecursive = function decryptRecursive(actionFunction, salt =
 export default {
   encrypt,
   decrypt,
+  cryptoencrypt,
+  cryptodecrypt,
   encryptRecursive,
-  decryptRecursive
+  decryptRecursive,
+  getRandomKey,
+  getIV,
+  getKeyFromPassword
 }
