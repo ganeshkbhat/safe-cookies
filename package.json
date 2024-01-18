@@ -1,5 +1,5 @@
 {
-  "name": "safecookies",
+  "name": "safecookie",
   "description": "Wrap the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
   "version": "1.0.0",
   "main": "index.js",
