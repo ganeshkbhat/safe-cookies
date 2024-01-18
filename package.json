@@ -1,15 +1,28 @@
 {
   "name": "safecookies",
-  "description": "Wrap most of the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
+  "description": "Wrap the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "mocha --reporter spec --require esm --recursive --timeout 60000"
   },
-  "keywords": [],
+  "keywords": [
+    "safe cookies",
+    "safe",
+    "cookies",
+    "safecookie",
+    "safe storage",
+    "safer cookies",
+    "safer storage",
+    "crypto function wrapper",
+    "encrypt - decrypt function wrapper",
+    "localStorage", 
+    "cookies", 
+    "safe password storage in database"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "hasher-apis": "^0.2.7"
   },
