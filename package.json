@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "./node_modules/.bin/browserify main.js > bundle.js",
     "test": "mocha --reporter spec --require esm --recursive --timeout 60000"
   },
   "keywords": [
@@ -17,16 +18,17 @@
     "safer storage",
     "crypto function wrapper",
     "encrypt - decrypt function wrapper",
-    "localStorage", 
-    "cookies", 
+    "localStorage",
+    "cookies",
     "safe password storage in database"
   ],
-  "author": "",
+  "author": "Ganesh Bhat <ganeshsurfs@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "hasher-apis": "^0.2.7"
   },
   "devDependencies": {
+    "browserify": "^17.0.0",
     "chai": "^5.0.0",
     "esm": "^3.2.25",
     "jsdom": "^23.2.0",
