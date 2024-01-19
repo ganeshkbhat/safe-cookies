@@ -1,9 +1,9 @@
 /**
  * 
- * Package: 
+ * Package: safecookie
  * Author: Ganesh B
  * Description: 
- * Install: npm i  --save
+ * Install: npm i safecookie --save
  * Github: https://github.com/ganeshkbhat/
  * npmjs Link: https://www.npmjs.com/package/
  * File: demos/decrypt.js
