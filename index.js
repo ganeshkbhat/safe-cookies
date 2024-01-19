@@ -17,22 +17,9 @@
 
 import crypto from "node:crypto";
 
-// function decrypt_string(encryptedMessage, encryptionMethod, secret, iv) {
-//   const buff = Buffer.from(encryptedMessage, 'base64');
-//   encryptedMessage = buff.toString('utf-8');
-//   var decryptor = Crypto.createDecipheriv(encryptionMethod, secret, iv);
-//   return decryptor.update(encryptedMessage, 'base64', 'utf8') + decryptor.final('utf8');
-// };
-
-// function decrypt_string(encryptedMessage, encryptionMethod, secret, iv) {
-//   const buff = Buffer.from(encryptedMessage, 'base64');
-//   encryptedMessage = buff.toString('utf-8');
-//   var decryptor = Crypto.createDecipheriv(encryptionMethod, secret, iv);
-//   return decryptor.update(encryptedMessage, 'base64', 'utf8') + decryptor.final('utf8');
-// };
 
 /** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
-const ALGORITHM = {
+export const ALGORITHM = {
 
   /**
    * GCM is an authenticated encryption mode that
@@ -72,7 +59,7 @@ const ALGORITHM = {
  * Function to get a IV value using a standard IV byte length
  *
  */
-const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
+export const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
 
 /**
  * getRandomKey
@@ -80,7 +67,7 @@ const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
  * Function to get a Key for a Crypto.CipherIV key
  *
  */
-const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
+export const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
 
 /**
  * 
@@ -90,22 +77,26 @@ const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
  * 
  * To prevent rainbow table attacks
  */
-const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
+export const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
 
 /**
-* 
-* @param {Buffer} password - The password to be used for generating key
-* 
-* To be used when key needs to be generated based on password.
-* The caller of this function has the responsibility to clear 
-* the Buffer after the key generation to prevent the password 
-* from lingering in the memory
+ * 
+ * getKeyFromPassword
+ * 
+ * @param {Buffer} password - The password to be used for generating key
+ * 
+ * To be used when key needs to be generated based on password.
+ * The caller of this function has the responsibility to clear 
+ * the Buffer after the key generation to prevent the password 
+ * from lingering in the memory
 */
 export const getKeyFromPassword = (password, salt) => {
   return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
 }
 
 /**
+* 
+* cryptoencrypt
 * 
 * @param {Buffer} messagetext - The clear text message to be encrypted
 * @param {Buffer} key - The key to be used for encryption
@@ -125,6 +116,8 @@ export const cryptoencrypt = (messagetext, key) => {
 }
 
 /**
+* 
+* cryptodecrypt
 * 
 * @param {Buffer} ciphertext - Cipher text
 * @param {Buffer} key - The key to be used for decryption
@@ -148,6 +141,7 @@ export const cryptodecrypt = (ciphertext, key) => {
 
 /**
  *
+ * encrypt
  *
  * @param {*} actionFunction
  * @param {string} [salt=""]
@@ -165,6 +159,7 @@ export const encrypt = function encrypt(actionFunction, salt = "", index = 1, en
 
 /**
  *
+ * decrypt
  *
  * @param {*} actionFunction
  * @param {string} [salt=""]
@@ -183,6 +178,7 @@ export const decrypt = function decrypt(actionFunction, salt = "", index = 1, de
 
 /**
  *
+ * encryptRecursive
  *
  * @param {*} actionFunction
  * @param {string} [salt=""]
@@ -195,6 +191,7 @@ export const encryptRecursive = function encryptRecursive(actionFunction, salt =
 
 /**
  *
+ * decryptRecursive
  *
  * @param {*} actionFunction
  * @param {string} [salt=""]
@@ -213,6 +210,7 @@ export default {
   encryptRecursive,
   decryptRecursive,
   getRandomKey,
+  getSalt,
   getIV,
   getKeyFromPassword
 }

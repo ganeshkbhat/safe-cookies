@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "./node_modules/.bin/browserify main.js > bundle.js",
+    "build": "browserify index.js > dist/safecookies.browser.js",
     "test": "mocha --reporter spec --require esm --recursive --timeout 60000"
   },
   "keywords": [
