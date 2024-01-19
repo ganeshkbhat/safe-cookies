@@ -6,7 +6,7 @@
  * Install: npm i safecookie --save
  * Github: https://github.com/ganeshkbhat/
  * npmjs Link: https://www.npmjs.com/package/
- * File: function.js
+ * File: functions.js
  * File Description: 
  * 
 */
