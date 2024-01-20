@@ -7,6 +7,8 @@ Do take a look at the [architectural concept here](https://medium.com/@ganeshsur
 
 You can find the [demos here](./demos)
 
+#### INSTALLATION
+
 `npm install safecookie`
 
 `npm install safecookies`

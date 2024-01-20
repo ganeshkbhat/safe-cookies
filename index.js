@@ -15,11 +15,11 @@
 
 'use strict';
 
-import crypto from "node:crypto";
+const crypto = require("node:crypto");
 
 
 /** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
-export const ALGORITHM = {
+module.exports.ALGORITHM = {
 
   /**
    * GCM is an authenticated encryption mode that
@@ -59,7 +59,7 @@ export const ALGORITHM = {
  * Function to get a IV value using a standard IV byte length
  *
  */
-export const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
+module.exports.getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
 
 /**
  * getRandomKey
@@ -67,7 +67,7 @@ export const getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
  * Function to get a Key for a Crypto.CipherIV key
  *
  */
-export const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
+module.exports.getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
 
 /**
  * 
@@ -77,7 +77,7 @@ export const getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
  * 
  * To prevent rainbow table attacks
  */
-export const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
+module.exports.getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
 
 /**
  * 
@@ -90,7 +90,7 @@ export const getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
  * the Buffer after the key generation to prevent the password 
  * from lingering in the memory
 */
-export const getKeyFromPassword = (password, salt) => {
+module.exports.getKeyFromPassword = (password, salt) => {
   return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
 }
 
@@ -105,7 +105,7 @@ export const getKeyFromPassword = (password, salt) => {
 * the Buffer after the encryption to prevent the message text 
 * and the key from lingering in the memory
 */
-export const cryptoencrypt = (messagetext, key) => {
+module.exports.cryptoencrypt = (messagetext, key) => {
   const iv = getIV();
   const cipher = crypto.createCipheriv(
     ALGORITHM.BLOCK_CIPHER, key, iv,
@@ -126,7 +126,7 @@ export const cryptoencrypt = (messagetext, key) => {
 * the Buffer after the decryption to prevent the message text 
 * and the key from lingering in the memory
 */
-export const cryptodecrypt = (ciphertext, key) => {
+module.exports.cryptodecrypt = (ciphertext, key) => {
   const authTag = ciphertext.slice(-16);
   const iv = ciphertext.slice(0, 12);
   const encryptedMessage = ciphertext.slice(12, -16);
@@ -149,7 +149,7 @@ export const cryptodecrypt = (ciphertext, key) => {
  * @param {*} [encrypter=cryptoencrypt]
  * @return {*} 
  */
-export const encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
+module.exports.encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     args[index] = encrypter(args[index], salt, ...options);
@@ -167,7 +167,7 @@ export const encrypt = function encrypt(actionFunction, salt = "", index = 1, en
  * @param {*} [decrypter=cryptodecrypt]
  * @return {*} 
  */
-export const decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
+module.exports.decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     let data = actionFunction(...args);
@@ -185,7 +185,7 @@ export const decrypt = function decrypt(actionFunction, salt = "", index = 1, de
  * @param {*} [encrypter=cryptoencrypt]
  * @return {*} 
  */
-export const encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
+module.exports.encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
   return (...args) => actionFunction(...args).map(v => encrypter(v, salt));
 }
 
@@ -198,11 +198,11 @@ export const encryptRecursive = function encryptRecursive(actionFunction, salt =
  * @param {*} [decrypter=cryptodecrypt]
  * @return {*} 
  */
-export const decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
+module.exports.decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
   return (...args) => actionFunction(...args).map(v => decrypter(v, salt));
 }
 
-export default {
+module.exports.default = {
   encrypt,
   decrypt,
   cryptoencrypt,

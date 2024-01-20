@@ -15,10 +15,10 @@
 
 'use strict';
 
-import { expect } from 'chai';
-import pkg from "../index.js";
+const { expect } = require('chai');
+const pkg = require("../index.js");
 const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword, getRandomKey } = pkg;
-import { hashContent, dehashContent } from "hasher-apis";
+const { hashContent, dehashContent } = require("hasher-apis");
 
 /**
  * NOTE: Always avoid nested structure to store values
@@ -105,7 +105,7 @@ function testReader(name) {
  * @return {*} 
  */
 function testReaderAll(name) {
-  console.log("testReaderAll log:",values);
+  console.log("testReaderAll log:", values);
   return values;
 }
 

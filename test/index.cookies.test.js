@@ -15,8 +15,8 @@
 
 'use strict';
 
-import { expect } from 'chai';
-import { encrypt, decrypt, encryptRecursive, decryptRecursive } from "../index.js";
+const { expect } = require('chai');
+const { encrypt, decrypt, encryptRecursive, decryptRecursive } = require("../index.js");
 
 var testCookieValues = {};
 var testEncryptCookieValues = {};

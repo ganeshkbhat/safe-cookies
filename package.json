@@ -3,9 +3,8 @@
   "description": "Wrap the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "build": "browserify index.js > dist/safecookies.browser.js",
+    "build": "browserify index.js > browser.js",
     "test": "mocha --reporter spec --require esm --recursive --timeout 60000"
   },
   "keywords": [
@@ -28,11 +27,13 @@
     "hasher-apis": "^0.2.7"
   },
   "devDependencies": {
+    "@splinetool/runtime": "^1.0.31",
     "browserify": "^17.0.0",
     "chai": "^5.0.0",
     "esm": "^3.2.25",
     "jsdom": "^23.2.0",
     "mocha": "^10.2.0",
+    "react": "^18.2.0",
     "react-cookie": "^7.0.0",
     "react-cookies": "^0.1.1",
     "toughcookies": "^4.1.4"
