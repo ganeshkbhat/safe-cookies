@@ -15,8 +15,20 @@
 
 'use strict';
 
-const { expect } = require('chai');
-const { encrypt, decrypt, encryptRecursive, decryptRecursive } = require("../index.js");
+const expect = require('chai').expect;
+const pkg = require("../index.js");
+const encrypt = pkg.encrypt;
+const decrypt = pkg.decrypt;
+const encryptRecursive = pkg.encryptRecursive;
+const decryptRecursive = pkg.decryptRecursive;
+const cryptoencrypt = pkg.cryptoencrypt;
+const cryptodecrypt = pkg.cryptodecrypt;
+const getKeyFromPassword = pkg.getKeyFromPassword;
+const getRandomKey = pkg.getRandomKey;
+
+// const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword, getRandomKey } = pkg;
+const hashContent = require("hasher-apis").hashContent;
+const dehashContent = require("hasher-apis").dehashContent;
 
 var testCookieValues = {};
 var testEncryptCookieValues = {};

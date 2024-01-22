@@ -15,11 +15,9 @@
 
 'use strict';
 
-const crypto = require("node:crypto");
+const crypto = require("crypto");
 
-
-/** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
-module.exports.ALGORITHM = {
+const ALGORITHM = {
 
   /**
    * GCM is an authenticated encryption mode that
@@ -50,7 +48,10 @@ module.exports.ALGORITHM = {
    * To prevent rainbow table attacks
    * */
   SALT_BYTE_LEN: 16
-}
+};
+
+/** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
+module.exports.ALGORITHM = ALGORITHM;
 
 /**
  *
@@ -59,7 +60,8 @@ module.exports.ALGORITHM = {
  * Function to get a IV value using a standard IV byte length
  *
  */
-module.exports.getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
+function getIV() { return crypto.randomBytes(ALGORITHM.IV_BYTE_LEN) };
+module.exports.getIV = getIV;
 
 /**
  * getRandomKey
@@ -67,7 +69,8 @@ module.exports.getIV = () => crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
  * Function to get a Key for a Crypto.CipherIV key
  *
  */
-module.exports.getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
+function getRandomKey() { return crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN) };
+module.exports.getRandomKey = getRandomKey;
 
 /**
  * 
@@ -77,7 +80,8 @@ module.exports.getRandomKey = () => crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN);
  * 
  * To prevent rainbow table attacks
  */
-module.exports.getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
+function getSalt() { return crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN) };
+module.exports.getSalt = getSalt;
 
 /**
  * 
@@ -90,9 +94,10 @@ module.exports.getSalt = () => crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN);
  * the Buffer after the key generation to prevent the password 
  * from lingering in the memory
 */
-module.exports.getKeyFromPassword = (password, salt) => {
+function getKeyFromPassword(password, salt) {
   return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
 }
+module.exports.getKeyFromPassword = getKeyFromPassword;
 
 /**
 * 
@@ -105,7 +110,7 @@ module.exports.getKeyFromPassword = (password, salt) => {
 * the Buffer after the encryption to prevent the message text 
 * and the key from lingering in the memory
 */
-module.exports.cryptoencrypt = (messagetext, key) => {
+function cryptoencrypt(messagetext, key) {
   const iv = getIV();
   const cipher = crypto.createCipheriv(
     ALGORITHM.BLOCK_CIPHER, key, iv,
@@ -114,6 +119,7 @@ module.exports.cryptoencrypt = (messagetext, key) => {
   encryptedMessage = Buffer.concat([encryptedMessage, cipher.final()]);
   return Buffer.concat([iv, encryptedMessage, cipher.getAuthTag()]);
 }
+module.exports.cryptoencrypt = cryptoencrypt;
 
 /**
 * 
@@ -126,7 +132,7 @@ module.exports.cryptoencrypt = (messagetext, key) => {
 * the Buffer after the decryption to prevent the message text 
 * and the key from lingering in the memory
 */
-module.exports.cryptodecrypt = (ciphertext, key) => {
+function cryptodecrypt(ciphertext, key) {
   const authTag = ciphertext.slice(-16);
   const iv = ciphertext.slice(0, 12);
   const encryptedMessage = ciphertext.slice(12, -16);
@@ -138,6 +144,7 @@ module.exports.cryptodecrypt = (ciphertext, key) => {
   messagetext = Buffer.concat([messagetext, decipher.final()]);
   return messagetext;
 }
+module.exports.cryptodecrypt = cryptodecrypt;
 
 /**
  *
@@ -149,13 +156,14 @@ module.exports.cryptodecrypt = (ciphertext, key) => {
  * @param {*} [encrypter=cryptoencrypt]
  * @return {*} 
  */
-module.exports.encrypt = function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
+function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt) {
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     args[index] = encrypter(args[index], salt, ...options);
     return actionFunction(...args);
   };
 }
+module.exports.encrypt = encrypt;
 
 /**
  *
@@ -167,7 +175,7 @@ module.exports.encrypt = function encrypt(actionFunction, salt = "", index = 1, 
  * @param {*} [decrypter=cryptodecrypt]
  * @return {*} 
  */
-module.exports.decrypt = function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
+function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt) {
   return function (...args) {
     let options = ["aes-256-ctr", "sha256", "base64", { logger: console.log }]
     let data = actionFunction(...args);
@@ -175,6 +183,7 @@ module.exports.decrypt = function decrypt(actionFunction, salt = "", index = 1, 
     return args[index];
   };
 }
+module.exports.decrypt = decrypt;
 
 /**
  *
@@ -185,9 +194,10 @@ module.exports.decrypt = function decrypt(actionFunction, salt = "", index = 1, 
  * @param {*} [encrypter=cryptoencrypt]
  * @return {*} 
  */
-module.exports.encryptRecursive = function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
+function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
   return (...args) => actionFunction(...args).map(v => encrypter(v, salt));
 }
+module.exports.encryptRecursive = encryptRecursive;
 
 /**
  *
@@ -198,19 +208,22 @@ module.exports.encryptRecursive = function encryptRecursive(actionFunction, salt
  * @param {*} [decrypter=cryptodecrypt]
  * @return {*} 
  */
-module.exports.decryptRecursive = function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
+function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
   return (...args) => actionFunction(...args).map(v => decrypter(v, salt));
 }
+module.exports.decryptRecursive = decryptRecursive;
 
-module.exports.default = {
-  encrypt,
-  decrypt,
-  cryptoencrypt,
-  cryptodecrypt,
-  encryptRecursive,
-  decryptRecursive,
-  getRandomKey,
-  getSalt,
-  getIV,
-  getKeyFromPassword
-}
+// const defaults = {
+//   encrypt,
+//   decrypt,
+//   cryptoencrypt,
+//   cryptodecrypt,
+//   encryptRecursive,
+//   decryptRecursive,
+//   getRandomKey,
+//   getSalt,
+//   getIV,
+//   getKeyFromPassword
+// }
+
+// module.exports.default = defaults;

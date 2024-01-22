@@ -15,10 +15,25 @@
 
 'use strict';
 
-const { expect } = require('chai');
+const expect = require('chai').expect;
 const pkg = require("../index.js");
-const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword, getRandomKey } = pkg;
-const { hashContent, dehashContent } = require("hasher-apis");
+const encrypt = pkg.encrypt;
+const decrypt = pkg.decrypt;
+const encryptRecursive = pkg.encryptRecursive;
+const decryptRecursive = pkg.decryptRecursive;
+const cryptoencrypt = pkg.cryptoencrypt;
+const cryptodecrypt = pkg.cryptodecrypt;
+const getKeyFromPassword = pkg.getKeyFromPassword;
+const getRandomKey = pkg.getRandomKey;
+
+// const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword, getRandomKey } = pkg;
+const hashContent = require("hasher-apis").hashContent;
+const dehashContent = require("hasher-apis").dehashContent;
+
+// import {expect} from 'chai';
+// import * as pkg from "../index.js";
+// const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword, getRandomKey } = pkg;
+// import { hashContent, dehashContent } from "hasher-apis";
 
 /**
  * NOTE: Always avoid nested structure to store values

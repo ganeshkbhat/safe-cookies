@@ -1,11 +1,12 @@
 {
   "name": "safecookie",
   "description": "Wrap the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
+  "module": "main.js",
   "scripts": {
     "build": "browserify index.js > browser.js",
-    "test": "mocha --reporter spec --require esm --recursive --timeout 60000"
+    "test": "mocha --reporter spec --recursive --timeout 60000"
   },
   "keywords": [
     "safe cookies",
@@ -27,9 +28,10 @@
     "hasher-apis": "^0.2.7"
   },
   "devDependencies": {
+    "chalk": "^4.1.2",
     "@splinetool/runtime": "^1.0.31",
     "browserify": "^17.0.0",
-    "chai": "^5.0.0",
+    "chai": "4.1.2",
     "esm": "^3.2.25",
     "jsdom": "^23.2.0",
     "mocha": "^10.2.0",
@@ -40,5 +42,16 @@
     "toughcookies": "^4.1.4",
     "universal-cookie-express": "^7.0.1",
     "web-storage-express-cookies": "^1.0.1"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ganeshkbhat/safe-cookies.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ganeshkbhat/safe-cookies/issues"
+  },
+  "homepage": "https://github.com/ganeshkbhat/safe-cookies#readme"
 }
