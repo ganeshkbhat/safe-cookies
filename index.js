@@ -19,6 +19,14 @@ const crypto = require("crypto");
 
 /** https://github.com/nodejs/undici/blob/main/lib/cookies/util.js */
 
+// https://wicg.github.io/cookie-store/#cookie-maximum-attribute-value-size
+const maxAttributeValueSize = 1024
+module.exports.maxAttributeValueSize = maxAttributeValueSize;
+
+// https://wicg.github.io/cookie-store/#cookie-maximum-name-value-pair-size
+const maxNameValuePairSize = 4096
+module.exports.maxNameValuePairSize = maxNameValuePairSize;
+
 /**
  *
  *
