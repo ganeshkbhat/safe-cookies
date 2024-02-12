@@ -25,13 +25,14 @@
   "author": "Ganesh Bhat <ganeshsurfs@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "browser-cookie-lite": "^1.0.4",
     "hasher-apis": "^0.2.7"
   },
   "devDependencies": {
-    "chalk": "^4.1.2",
     "@splinetool/runtime": "^1.0.31",
     "browserify": "^17.0.0",
     "chai": "4.1.2",
+    "chalk": "^4.1.2",
     "esm": "^3.2.25",
     "jsdom": "^23.2.0",
     "mocha": "^10.2.0",
