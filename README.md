@@ -1,5 +1,5 @@
 # safe-cookies
-Wrap the `cookie libraries` with a `safer` `encrypt` - `decrypt` function - should work with most libraries. 
+Wrap the `cookie libraries` functions like `somecookie.get, somecookie.set, or other setters and getters` with a `safer` `encrypt` - `decrypt` function :: should work with most libraries. 
 
 The `encrypt`, `decrypt` function wraps a normal `setter (encrypt)` and `getter (decrypt)` functions with crypto functions that help `create safer value storage options for procedures` like `localStorage`, `cookies`, `password storage in database` etc. 
 
@@ -23,10 +23,14 @@ const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cry
 
 console.log("Testing new crypter");
 
-let cryptedtext = encrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptoencrypt)("Testing new crypter");
+let cryptedfn = encrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptoencrypt)
+
+let cryptedtext = cryptedfn("Testing new crypter");
 console.log(cryptedtext.toString("base64"));
 
-let decryptedtext = decrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptodecrypt)(cryptedtext);
+let decryptedfn = decrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptodecrypt)
+
+let decryptedtext = decryptedfn(cryptedtext);
 console.log(decryptedtext.toString());
 
 ```
@@ -40,10 +44,14 @@ const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cry
 
 console.log("Testing new crypter");
 
-let cryptedtext = encrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptoencrypt)("Testing new crypter");
+let cryptedfn = encrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptoencrypt)
+
+let cryptedtext = cryptedfn("Testing new crypter");
 console.log(cryptedtext.toString("base64"));
 
-let decryptedtext = decrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptodecrypt)(cryptedtext);
+let decryptedfn = decrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptodecrypt)
+
+let decryptedtext = decryptedfn(cryptedtext);
 console.log(decryptedtext.toString());
 
 ```
