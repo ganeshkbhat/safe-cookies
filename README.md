@@ -1,11 +1,11 @@
 # safe-cookies
-Wrap the cookie libraries with a safer encrypt - decrypt function - should work with most libraries. 
+Wrap the `cookie libraries` with a `safer` `encrypt` - `decrypt` function - should work with most libraries. 
 
 The `encrypt`, `decrypt` function wraps a normal `setter (encrypt)` and `getter (decrypt)` functions with crypto functions that help `create safer value storage options for procedures` like `localStorage`, `cookies`, `password storage in database` etc. 
 
 Do take a look at the [architectural concept here](https://medium.com/@ganeshsurfs/toying-with-the-idea-of-storage-security-9fdd65707d6e)
 
-You can find the [demos here](./demos)
+You can find the [demos here](https://github.com/ganeshkbhat/safe-cookies/tree/main/demos)
 
 #### INSTALLATION
 
