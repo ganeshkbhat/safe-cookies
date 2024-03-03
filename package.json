@@ -5,8 +5,10 @@
   "main": "index.js",
   "module": "main.js",
   "scripts": {
-    "build": "browserify index.js > browser.js",
-    "test": "mocha --reporter spec --recursive --timeout 60000"
+    "test": "mocha --reporter spec --recursive --timeout 60000",
+    "uglify": "uglifyjs --compress --mangle reserved=['$','require','exports'] index.js -o index.min.js",
+    "gitadd": "git add .",
+    "build": "tsc index.js --allowJs --emitDeclarationOnly --declaration --declarationMap --sourceMap"
   },
   "keywords": [
     "safe cookies",
@@ -41,15 +43,7 @@
     "shared-cookies": "^0.0.4",
     "toughcookies": "^4.1.4",
     "universal-cookie-express": "^7.0.1",
-    "web-storage-express-cookies": "^1.0.1",
-    "chai": "^4.4.1",
-    "mocha": "^10.2.0",
-    "pre-commit": "^1.2.2",
-    "pre-push": "^0.1.4",
-    "sinon": "^17.0.1",
-    "typescript": "^5.3.3",
-    "uglify-js": "^3.17.4",
-    "unimported": "^1.31.1"
+    "web-storage-express-cookies": "^1.0.1"
   },
   "directories": {
     "test": "test"

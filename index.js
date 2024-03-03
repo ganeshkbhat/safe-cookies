@@ -15,17 +15,32 @@
 
 'use strict';
 
-const crypto = require("crypto");
+
+/**
+ * isBrowser
+ *
+ * @return {*} 
+ */
+function isBrowser() {
+  if (typeof process === "object" && typeof require === "function") {
+    return false;
+  }
+  if (typeof importScripts === "function") { return false; }
+  if (typeof window === "object") { return true; }
+}
+
+var crypto;
+if (!isBrowser()) {
+  crypto = require("crypto");
+}
 
 /** https://github.com/nodejs/undici/blob/main/lib/cookies/util.js */
 
 // https://wicg.github.io/cookie-store/#cookie-maximum-attribute-value-size
 const maxAttributeValueSize = 1024
-module.exports.maxAttributeValueSize = maxAttributeValueSize;
 
 // https://wicg.github.io/cookie-store/#cookie-maximum-name-value-pair-size
 const maxNameValuePairSize = 4096
-module.exports.maxNameValuePairSize = maxNameValuePairSize;
 
 /**
  *
@@ -50,7 +65,6 @@ function isCTLExcludingHtab(value) {
     }
   }
 }
-module.exports.isCTLExcludingHtab = isCTLExcludingHtab;
 
 /**
  CHAR           = <any US-ASCII character (octets 0 - 127)>
@@ -89,7 +103,7 @@ function validateCookieName(name) {
     }
   }
 }
-module.exports.validateCookieName = validateCookieName;
+
 
 /**
  cookie-value      = *cookie-octet / ( DQUOTE *cookie-octet DQUOTE )
@@ -115,7 +129,7 @@ function validateCookieValue(value) {
     }
   }
 }
-module.exports.validateCookieValue = validateCookieValue;
+
 
 /**
  * path-value        = <any CHAR except CTLs or ";">
@@ -130,7 +144,7 @@ function validateCookiePath(path) {
     }
   }
 }
-module.exports.validateCookiePath = validateCookiePath;
+
 
 /**
  * I have no idea why these values aren't allowed to be honest,
@@ -146,7 +160,7 @@ function validateCookieDomain(domain) {
     throw new Error('Invalid cookie domain')
   }
 }
-module.exports.validateCookieDomain = validateCookieDomain;
+
 
 /**
  * @see https://www.rfc-editor.org/rfc/rfc7231#section-7.1.1.1
@@ -214,7 +228,6 @@ function toIMFDate(date) {
 
   return `${dayName}, ${day} ${month} ${year} ${hour}:${minute}:${second} GMT`
 }
-module.exports.toIMFDate = toIMFDate;
 
 /**
  max-age-av        = "Max-Age=" non-zero-digit *DIGIT
@@ -228,7 +241,7 @@ function validateCookieMaxAge(maxAge) {
     throw new Error('Invalid cookie max-age')
   }
 }
-module.exports.validateCookieMaxAge = validateCookieMaxAge;
+
 
 /**
  * @see https://www.rfc-editor.org/rfc/rfc6265#section-4.1.1
@@ -299,7 +312,6 @@ function stringify(cookie) {
 
   return out.join('; ')
 }
-module.exports.stringify = stringify;
 
 /** https://github.com/nodejs/undici/blob/main/lib/cookies/util.js */
 
@@ -336,8 +348,6 @@ const ALGORITHM = {
   SALT_BYTE_LEN: 16
 };
 
-/** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
-module.exports.ALGORITHM = ALGORITHM;
 
 /**
  *
@@ -347,7 +357,6 @@ module.exports.ALGORITHM = ALGORITHM;
  *
  */
 function getIV() { return crypto.randomBytes(ALGORITHM.IV_BYTE_LEN) };
-module.exports.getIV = getIV;
 
 /**
  * getRandomKey
@@ -356,7 +365,7 @@ module.exports.getIV = getIV;
  *
  */
 function getRandomKey() { return crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN) };
-module.exports.getRandomKey = getRandomKey;
+
 
 /**
  * 
@@ -367,7 +376,6 @@ module.exports.getRandomKey = getRandomKey;
  * To prevent rainbow table attacks
  */
 function getSalt() { return crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN) };
-module.exports.getSalt = getSalt;
 
 /**
  * 
@@ -383,7 +391,6 @@ module.exports.getSalt = getSalt;
 function getKeyFromPassword(password, salt) {
   return crypto.scryptSync(password, salt, ALGORITHM.KEY_BYTE_LEN);
 }
-module.exports.getKeyFromPassword = getKeyFromPassword;
 
 /**
 * 
@@ -405,7 +412,6 @@ function cryptoencrypt(messagetext, key) {
   encryptedMessage = Buffer.concat([encryptedMessage, cipher.final()]);
   return Buffer.concat([iv, encryptedMessage, cipher.getAuthTag()]);
 }
-module.exports.cryptoencrypt = cryptoencrypt;
 
 /**
 * 
@@ -430,7 +436,6 @@ function cryptodecrypt(ciphertext, key) {
   messagetext = Buffer.concat([messagetext, decipher.final()]);
   return messagetext;
 }
-module.exports.cryptodecrypt = cryptodecrypt;
 
 /**
  *
@@ -449,7 +454,6 @@ function encrypt(actionFunction, salt = "", index = 1, encrypter = cryptoencrypt
     return actionFunction(...args);
   };
 }
-module.exports.encrypt = encrypt;
 
 /**
  *
@@ -469,7 +473,6 @@ function decrypt(actionFunction, salt = "", index = 1, decrypter = cryptodecrypt
     return args[index];
   };
 }
-module.exports.decrypt = decrypt;
 
 /**
  *
@@ -483,7 +486,6 @@ module.exports.decrypt = decrypt;
 function encryptRecursive(actionFunction, salt = "", encrypter = cryptoencrypt) {
   return (...args) => actionFunction(...args).map(v => encrypter(v, salt));
 }
-module.exports.encryptRecursive = encryptRecursive;
 
 /**
  *
@@ -497,7 +499,75 @@ module.exports.encryptRecursive = encryptRecursive;
 function decryptRecursive(actionFunction, salt = "", decrypter = cryptodecrypt) {
   return (...args) => actionFunction(...args).map(v => decrypter(v, salt));
 }
-module.exports.decryptRecursive = decryptRecursive;
+
+/**
+ *
+ * getCookie
+ * Basic set cookies function does not include the encryption decryption - please include
+ * 
+ * // returns the cookie with the given name,
+ * // or undefined if not found
+ * // Reference https://javascript.info/cookie
+ *
+ * @param {*} name
+ * @return {*} 
+ */
+function getCookie(name) {
+  let matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+
+/**
+ * 
+ * setCookie
+ * Basic set cookies function does not include the encryption decryption - please include
+ * 
+ * // Reference https://javascript.info/cookie
+ *
+ * @param {*} name
+ * @param {*} value
+ * @param {*} [attributes={}]
+ */
+function setCookie(name, value, attributes = {}) {
+  attributes = {
+    path: '/',
+    ...attributes
+  };
+
+  if (attributes.expires instanceof Date) {
+    attributes.expires = attributes.expires.toUTCString();
+  }
+  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+  for (let attributeKey in attributes) {
+    updatedCookie += "; " + attributeKey;
+    let attributeValue = attributes[attributeKey];
+    if (attributeValue !== true) {
+      updatedCookie += "=" + attributeValue;
+    }
+  }
+  document.cookie = updatedCookie;
+}
+
+
+/**
+ * 
+ * deleteCookie
+ * Basic delete cookies function does not include the encryption decryption - please include
+ * 
+ * // Example of use:
+ * // setCookie('user', 'John', {secure: true, 'max-age': 3600});
+ * // Reference https://javascript.info/cookie
+ *
+ * @param {*} name
+ */
+function deleteCookie(name) {
+  setCookie(name, "", {
+    'max-age': -1
+  })
+}
 
 // const defaults = {
 //   encrypt,
@@ -513,3 +583,34 @@ module.exports.decryptRecursive = decryptRecursive;
 // }
 
 // module.exports.default = defaults;
+
+if (!isBrowser()) {
+  module.exports.maxAttributeValueSize = maxAttributeValueSize;
+  module.exports.maxNameValuePairSize = maxNameValuePairSize;
+  module.exports.isCTLExcludingHtab = isCTLExcludingHtab;
+  module.exports.validateCookieName = validateCookieName;
+  module.exports.validateCookieValue = validateCookieValue;
+  module.exports.validateCookiePath = validateCookiePath;
+  module.exports.validateCookieDomain = validateCookieDomain;
+  module.exports.toIMFDate = toIMFDate;
+  module.exports.validateCookieMaxAge = validateCookieMaxAge;
+  module.exports.stringify = stringify;
+
+  /** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
+  module.exports.ALGORITHM = ALGORITHM;
+  module.exports.getIV = getIV;
+  module.exports.getRandomKey = getRandomKey;
+  module.exports.getSalt = getSalt;
+  module.exports.getKeyFromPassword = getKeyFromPassword;
+  module.exports.cryptoencrypt = cryptoencrypt;
+  module.exports.cryptodecrypt = cryptodecrypt;
+  module.exports.encrypt = encrypt;
+  module.exports.decrypt = decrypt;
+  module.exports.encryptRecursive = encryptRecursive;
+  module.exports.decryptRecursive = decryptRecursive;
+
+  module.exports.getCookie = getCookie;
+  module.exports.setCookie = setCookie;
+  module.exports.deleteCookie = deleteCookie;
+
+}
