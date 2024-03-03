@@ -3,12 +3,24 @@
   "description": "Wrap the cookie libraries with a safer encrypt - decrypt function - should work with most libraries",
   "version": "1.1.0",
   "main": "index.js",
-  "module": "main.js",
+  "module": "index.js",
+  "exports": {
+    "require": "./index.js",
+    "import": "./index.mjs"
+  },
+  "unpkg": "index.min.js",
   "scripts": {
     "test": "mocha --reporter spec --recursive --timeout 60000",
     "uglify": "uglifyjs --compress --mangle reserved=['$','require','exports'] index.js -o index.min.js",
     "gitadd": "git add .",
-    "build": "tsc index.js --allowJs --emitDeclarationOnly --declaration --declarationMap --sourceMap"
+    "buildtsc": "tsc index.js --allowJs --emitDeclarationOnly --declaration --declarationMap --sourceMap"
+  },
+  "pre-commit": {
+    "run": [
+      "uglify",
+      "gitadd",
+      "test"
+    ]
   },
   "keywords": [
     "safe cookies",
@@ -33,6 +45,18 @@
   "devDependencies": {
     "@types/node": "^20.11.16",
     "@splinetool/runtime": "^1.0.31",
+    "@types/chai": "^4.3.11",
+    "@types/eslint": "^8.56.2",
+    "@types/mocha": "^10.0.6",
+    "chai": "^4.4.1",
+    "live-server": "^1.2.2",
+    "mocha": "^10.2.0",
+    "pre-commit": "^1.2.2",
+    "pre-push": "^0.1.4",
+    "sinon": "^17.0.1",
+    "typescript": "^5.3.3",
+    "uglify-js": "^3.17.4",
+    "unimported": "^1.31.1",
     "browserify": "^17.0.0",
     "chalk": "^4.1.2",
     "esm": "^3.2.25",

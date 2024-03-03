@@ -348,15 +348,62 @@ const ALGORITHM = {
   SALT_BYTE_LEN: 16
 };
 
+/**
+ *
+ *
+ * @param {*} message
+ * @return {*} 
+ */
+function browserEncode(message) {
+  // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt
+  let enc = new TextEncoder();
+  return enc.encode(message);
+}
 
 /**
  *
+ *
+ * @param {*} encodedmessage
+ * @return {*} 
+ */
+function browserDecode(encodedmessage) {
+  // https://www.w3docs.com/learn-javascript/textdecoder-and-textencoder.html
+  let enc = new TextDecoder();
+  return enc.decode(encodedmessage);
+}
+
+/**
+ * randomBytes
+ * 
+ * Browser implementation of crypto.randomBytes
+ * 
+ * Reference https://gist.github.com/alexdiliberto/39a4ad0453310d0a69ce
+ *
+ * @return {*} 
+ */
+function randomBytes() {
+  var crypto = (self.crypto || self.msCrypto), QUOTA = 65536;
+  return function (n) {
+    var a = new Uint8Array(n);
+    for (var i = 0; i < n; i += QUOTA) {
+      crypto.getRandomValues(a.subarray(i, i + Math.min(n - i, QUOTA)));
+    }
+    return a;
+  };
+}
+
+/**
  * getIV
  * 
  * Function to get a IV value using a standard IV byte length
  *
  */
-function getIV() { return crypto.randomBytes(ALGORITHM.IV_BYTE_LEN) };
+function getIV() {
+  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) {
+    return randomBytes(ALGORITHM.IV_BYTE_LEN)
+  }
+  return crypto.randomBytes(ALGORITHM.IV_BYTE_LEN);
+};
 
 /**
  * getRandomKey
@@ -364,18 +411,95 @@ function getIV() { return crypto.randomBytes(ALGORITHM.IV_BYTE_LEN) };
  * Function to get a Key for a Crypto.CipherIV key
  *
  */
-function getRandomKey() { return crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN) };
-
+function getRandomKey() {
+  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) {
+    return randomBytes(ALGORITHM.KEY_BYTE_LEN)
+  }
+  return crypto.randomBytes(ALGORITHM.KEY_BYTE_LEN)
+};
 
 /**
- * 
  * getSalt
  * 
  * Function to get a salt of specific byte length 
  * 
  * To prevent rainbow table attacks
  */
-function getSalt() { return crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN) };
+function getSalt() {
+  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) {
+    return randomBytes(ALGORITHM.SALT_BYTE_LEN)
+  }
+  return crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN)
+};
+
+/**
+ * generateJwtSecret
+ * 
+ * https://github.com/GladysAssistant/Gladys/tree/5eb8e107d163b05ce29dc816488876d898c26c05/server/utils/jwtSecret.js#L5
+ * https://github.com/tulios/kafkajs/tree/f7a166488321216a0feec4428f8e589b116eb31f/testHelpers/index.js#L26
+ * 
+ * @private
+ * @description Generate a jwt secret.
+ * @example
+ * const jwtSecret = generateJwtSecret();
+ * @returns {string} JwtSecret.
+ */
+function generateJwtSecret() {
+  let rd;
+  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) { rd = randomBytes } else { rd = crypto.randomBytes }
+  const jwtSecret = rd(Math.ceil(JWT_SECRET_LENGTH / 2))
+    .toString('hex') // convert to hexadecimal format
+    .slice(0, JWT_SECRET_LENGTH); // return required number of characters
+
+  return jwtSecret;
+}
+
+/**
+  * In cryptography, a nonce is an arbitrary number that can be used just once.
+  * It is similar in spirit to a nonce * word, hence the name. It is often a random or pseudo-random
+  * number issued in an authentication protocol to * ensure that old communications cannot be reused
+  * in replay attacks.
+  * 
+  * https://github.com/tulios/kafkajs/tree/f7a166488321216a0feec4428f8e589b116eb31f/src/broker/saslAuthenticator/scram.js#L47
+  *
+  * @returns {String}
+  */
+function nonce() {
+  let rd;
+  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) { rd = randomBytes } else { rd = crypto.randomBytes }
+  return rd(16)
+    .toString('base64')
+    .replace(URLSAFE_BASE64_PLUS_REGEX, '-') // make it url safe
+    .replace(URLSAFE_BASE64_SLASH_REGEX, '_')
+    .replace(URLSAFE_BASE64_TRAILING_EQUAL_REGEX, '')
+    .toString('ascii')
+}
+
+/**
+ * randomString
+ * 
+ * // Returns a new random alphanumeric string of the given size.
+ * // Note: to simplify implementation, the result has slight modulo bias,
+ * // because chars length of 62 doesn't divide the number of all bytes
+ * // (256) evenly. Such bias is acceptable for most cases when the output
+ * // length is long enough and doesn't need to be uniform.
+ * // https://www.tabnine.com/code/javascript/functions/crypto/randomBytes?snippet=5f67c3314b42a09e18720865
+ *
+ * @param {*} size
+ * @return {*} 
+ */
+function randomString(size) {
+  if (size === 0) {
+    throw new Error('Zero-length randomString is useless.');
+  }
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + 'abcdefghijklmnopqrstuvwxyz' + '0123456789';
+  let objectId = '';
+  const bytes = (0, crypto?.randomBytes || randomBytes)(size);
+  for (let i = 0; i < bytes.length; ++i) {
+    objectId += chars[bytes.readUInt8(i) % chars.length];
+  }
+  return objectId;
+}
 
 /**
  * 
@@ -519,7 +643,6 @@ function getCookie(name) {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-
 /**
  * 
  * setCookie
@@ -550,7 +673,6 @@ function setCookie(name, value, attributes = {}) {
   }
   document.cookie = updatedCookie;
 }
-
 
 /**
  * 
@@ -585,6 +707,7 @@ function deleteCookie(name) {
 // module.exports.default = defaults;
 
 if (!isBrowser()) {
+
   module.exports.maxAttributeValueSize = maxAttributeValueSize;
   module.exports.maxNameValuePairSize = maxNameValuePairSize;
   module.exports.isCTLExcludingHtab = isCTLExcludingHtab;
@@ -598,6 +721,7 @@ if (!isBrowser()) {
 
   /** @type { BLOCK_CIPHER, AUTH_TAG_BYTE_LEN, IV_BYTE_LEN, KEY_BYTE_LEN, SALT_BYTE_LEN } */
   module.exports.ALGORITHM = ALGORITHM;
+
   module.exports.getIV = getIV;
   module.exports.getRandomKey = getRandomKey;
   module.exports.getSalt = getSalt;
@@ -612,5 +736,12 @@ if (!isBrowser()) {
   module.exports.getCookie = getCookie;
   module.exports.setCookie = setCookie;
   module.exports.deleteCookie = deleteCookie;
+
+  module.exports.generateJwtSecret = generateJwtSecret;
+  module.exports.nonce = nonce;
+  module.exports.randomBytes = randomBytes;
+  module.exports.randomString = randomString;
+  module.exports.browserEncode = browserEncode;
+  module.exports.browserDecode = browserDecode;
 
 }
