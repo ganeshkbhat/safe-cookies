@@ -9,12 +9,17 @@
  * File: index.js
  * File Description: 
  * 
+ * https://github.com/vibornoff/webcrypto-shim/blob/master/webcrypto-shim.js
+ * 
+ * 
 */
 
 /* eslint no-console: 0 */
 
 'use strict';
 
+
+// Refs: https://github.com/auth0/auth0-spa-js/issues/113
 
 /**
  * isBrowser
@@ -30,9 +35,8 @@ function isBrowser() {
 }
 
 var crypto;
-if (!isBrowser()) {
-  crypto = require("crypto");
-}
+
+if (!isBrowser()) { crypto = require("crypto"); } else { crypto = window.crypto; }
 
 /** https://github.com/nodejs/undici/blob/main/lib/cookies/util.js */
 
