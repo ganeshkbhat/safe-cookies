@@ -432,48 +432,48 @@ function getSalt() {
   return crypto.randomBytes(ALGORITHM.SALT_BYTE_LEN)
 };
 
-/**
- * generateJwtSecret
- * 
- * https://github.com/GladysAssistant/Gladys/tree/5eb8e107d163b05ce29dc816488876d898c26c05/server/utils/jwtSecret.js#L5
- * https://github.com/tulios/kafkajs/tree/f7a166488321216a0feec4428f8e589b116eb31f/testHelpers/index.js#L26
- * 
- * @private
- * @description Generate a jwt secret.
- * @example
- * const jwtSecret = generateJwtSecret();
- * @returns {string} JwtSecret.
- */
-function generateJwtSecret() {
-  let rd;
-  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) { rd = randomBytes } else { rd = crypto.randomBytes }
-  const jwtSecret = rd(Math.ceil(JWT_SECRET_LENGTH / 2))
-    .toString('hex') // convert to hexadecimal format
-    .slice(0, JWT_SECRET_LENGTH); // return required number of characters
+// /**
+//  * generateJwtSecret
+//  * 
+//  * https://github.com/GladysAssistant/Gladys/tree/5eb8e107d163b05ce29dc816488876d898c26c05/server/utils/jwtSecret.js#L5
+//  * https://github.com/tulios/kafkajs/tree/f7a166488321216a0feec4428f8e589b116eb31f/testHelpers/index.js#L26
+//  * 
+//  * @private
+//  * @description Generate a jwt secret.
+//  * @example
+//  * const jwtSecret = generateJwtSecret();
+//  * @returns {string} JwtSecret.
+//  */
+// function generateJwtSecret() {
+//   let rd;
+//   if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) { rd = randomBytes } else { rd = crypto.randomBytes }
+//   const jwtSecret = rd(Math.ceil(JWT_SECRET_LENGTH / 2))
+//     .toString('hex') // convert to hexadecimal format
+//     .slice(0, JWT_SECRET_LENGTH); // return required number of characters
 
-  return jwtSecret;
-}
+//   return jwtSecret;
+// }
 
-/**
-  * In cryptography, a nonce is an arbitrary number that can be used just once.
-  * It is similar in spirit to a nonce * word, hence the name. It is often a random or pseudo-random
-  * number issued in an authentication protocol to * ensure that old communications cannot be reused
-  * in replay attacks.
-  * 
-  * https://github.com/tulios/kafkajs/tree/f7a166488321216a0feec4428f8e589b116eb31f/src/broker/saslAuthenticator/scram.js#L47
-  *
-  * @returns {String}
-  */
-function nonce() {
-  let rd;
-  if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) { rd = randomBytes } else { rd = crypto.randomBytes }
-  return rd(16)
-    .toString('base64')
-    .replace(URLSAFE_BASE64_PLUS_REGEX, '-') // make it url safe
-    .replace(URLSAFE_BASE64_SLASH_REGEX, '_')
-    .replace(URLSAFE_BASE64_TRAILING_EQUAL_REGEX, '')
-    .toString('ascii')
-}
+// /**
+//   * In cryptography, a nonce is an arbitrary number that can be used just once.
+//   * It is similar in spirit to a nonce * word, hence the name. It is often a random or pseudo-random
+//   * number issued in an authentication protocol to * ensure that old communications cannot be reused
+//   * in replay attacks.
+//   * 
+//   * https://github.com/tulios/kafkajs/tree/f7a166488321216a0feec4428f8e589b116eb31f/src/broker/saslAuthenticator/scram.js#L47
+//   *
+//   * @returns {String}
+//   */
+// function nonce() {
+//   let rd;
+//   if (typeof self !== 'undefined' && (self.crypto || self.msCrypto)) { rd = randomBytes } else { rd = crypto.randomBytes }
+//   return rd(16)
+//     .toString('base64')
+//     .replace(URLSAFE_BASE64_PLUS_REGEX, '-') // make it url safe
+//     .replace(URLSAFE_BASE64_SLASH_REGEX, '_')
+//     .replace(URLSAFE_BASE64_TRAILING_EQUAL_REGEX, '')
+//     .toString('ascii')
+// }
 
 /**
  * randomString
@@ -737,8 +737,8 @@ if (!isBrowser()) {
   module.exports.setCookie = setCookie;
   module.exports.deleteCookie = deleteCookie;
 
-  module.exports.generateJwtSecret = generateJwtSecret;
-  module.exports.nonce = nonce;
+  // module.exports.generateJwtSecret = generateJwtSecret;
+  // module.exports.nonce = nonce;
   module.exports.randomBytes = randomBytes;
   module.exports.randomString = randomString;
   module.exports.browserEncode = browserEncode;
