@@ -14,3 +14,5 @@
 /* eslint no-console: 0 */
 
 'use strict';
+
+const pkg = require("../index.js");
