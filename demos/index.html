@@ -15,17 +15,25 @@
     let key = getKeyFromPassword("password", "testsalt");
     let yourFnThatReturnsValue = (v) => { console.log(v.toString("base64")); return v; }
 
-    // USAGE: 
+    // 
+    // USAGE:
+    //  
     //    encrypt(yourfunc, key_generated, value_arg_index, cryptoencrypt) 
     //
     //    encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt) 
     // 
     // if the value to be encrypted is argument index 0 then use 0 
     //      else use the index of the value argument
+    // 
     // if the value to be encrypted is argument index 1 then use 1 
     //      else use the index of the value argument
-    let cryptedfn = encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt) 
-    let cryptedtext = cryptedfn("Testing new crypter"); 
+    // 
+    //      yourfunc(value) =======> index is 0
+    //      yourfunc(something, value) ========> index is 1
+    // 
+
+    let cryptedfn = encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt)
+    let cryptedtext = cryptedfn("Testing new crypter");
     console.log(cryptedtext.toString("base64"));
 
     let decryptedfn = decrypt(yourFnThatReturnsValue, key, 0, cryptodecrypt)
