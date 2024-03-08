@@ -1,4 +1,4 @@
-# safe-cookies
+# safe-cookie
 Wrap the `cookie libraries` functions like `somecookie.get, somecookie.set, or other setters and getters` with a `safer` `encrypt` - `decrypt` function :: should work with most libraries. 
 
 The `encrypt`, `decrypt` function wraps a normal `setter (encrypt)` and `getter (decrypt)` functions with crypto functions that help `create safer value storage options for procedures` like `localStorage`, `cookies`, `password storage in database` etc. 
