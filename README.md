@@ -21,15 +21,31 @@ You can find the [demos here](https://github.com/ganeshkbhat/safe-cookies/tree/m
 import pkg from "safecookie";
 const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword } = pkg;
 
-console.log("Testing new crypter");
+let key = getKeyFromPassword("password", "testsalt");
+let yourFnThatReturnsValue = (v) => { console.log(v.toString("base64")); return v; }
 
-let cryptedfn = encrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptoencrypt)
+// 
+// USAGE:
+//  
+//    encrypt(yourfunc, key_generated, value_arg_index, cryptoencrypt) 
+//
+//    encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt) 
+// 
+// if the value to be encrypted is argument index 0 then use 0 
+//      else use the index of the value argument
+// 
+// if the value to be encrypted is argument index 1 then use 1 
+//      else use the index of the value argument
+// 
+//      yourfunc(value) =======> index is 0
+//      yourfunc(something, value) ========> index is 1
+// 
 
-let cryptedtext = cryptedfn("Testing new crypter");
+let cryptedfn = encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt) 
+let cryptedtext = cryptedfn("Testing new crypter"); 
 console.log(cryptedtext.toString("base64"));
 
-let decryptedfn = decrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptodecrypt)
-
+let decryptedfn = decrypt(yourFnThatReturnsValue, key, 0, cryptodecrypt)
 let decryptedtext = decryptedfn(cryptedtext);
 console.log(decryptedtext.toString());
 
@@ -42,19 +58,36 @@ console.log(decryptedtext.toString());
 import pkg from "safecookie";
 const { encrypt, decrypt, encryptRecursive, decryptRecursive, cryptoencrypt, cryptodecrypt, getKeyFromPassword } = pkg;
 
-console.log("Testing new crypter");
+let key = getKeyFromPassword("password", "testsalt");
+let yourFnThatReturnsValue = (v) => { console.log(v.toString("base64")); return v; }
 
-let cryptedfn = encrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptoencrypt)
+// 
+// USAGE:
+//  
+//    encrypt(yourfunc, key_generated, value_arg_index, cryptoencrypt) 
+//
+//    encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt) 
+// 
+// if the value to be encrypted is argument index 0 then use 0 
+//      else use the index of the value argument
+// 
+// if the value to be encrypted is argument index 1 then use 1 
+//      else use the index of the value argument
+// 
+//      yourfunc(value) =======> index is 0
+//      yourfunc(something, value) ========> index is 1
+// 
 
-let cryptedtext = cryptedfn("Testing new crypter");
+let cryptedfn = encrypt(yourFnThatReturnsValue, key, 0, cryptoencrypt) 
+let cryptedtext = cryptedfn("Testing new crypter"); 
 console.log(cryptedtext.toString("base64"));
 
-let decryptedfn = decrypt((v) => { console.log(v.toString("base64")); return v; }, getKeyFromPassword("password", "testsalt"), 0, cryptodecrypt)
-
+let decryptedfn = decrypt(yourFnThatReturnsValue, key, 0, cryptodecrypt)
 let decryptedtext = decryptedfn(cryptedtext);
 console.log(decryptedtext.toString());
 
 ```
+
 
 #### NOTE:
 

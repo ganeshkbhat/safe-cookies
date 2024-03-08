@@ -15,7 +15,7 @@
 
 'use strict';
 
-import * as safecookie from "./index.js";
+import { default as safecookie } from "./index.js";
 
 export default {
   ...safecookie
