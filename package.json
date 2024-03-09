@@ -13,9 +13,17 @@
     "test": "mocha --reporter spec --recursive --timeout 60000",
     "uglify": "uglifyjs --compress --mangle reserved=['$','require','exports'] index.js -o index.min.js",
     "gitadd": "git add .",
-    "buildtsc": "tsc index.js --allowJs --emitDeclarationOnly --declaration --declarationMap --sourceMap"
+    "buildtsc": "tsc index.js --allowJs --emitDeclarationOnly --declaration --declarationMap --sourceMap",
+    "browsertest": "jasmine-browser-runner runSpecs --enable-chrome-browser-cloud-management"
   },
   "pre-commit": {
+    "run": [
+      "uglify",
+      "gitadd",
+      "test"
+    ]
+  },
+  "pre-push": {
     "run": [
       "uglify",
       "gitadd",
@@ -34,38 +42,39 @@
     "encrypt - decrypt function wrapper",
     "localStorage",
     "cookies",
-    "safe password storage in database"
+    "safe password storage in database",
+    "browser-cookie-lite"
   ],
   "author": "Ganesh Bhat <ganeshsurfs@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "browser-cookie-lite": "^1.0.4",
-    "hasher-apis": "^0.2.7"
-  },
   "devDependencies": {
-    "@types/node": "^20.11.16",
     "@splinetool/runtime": "^1.0.31",
     "@types/chai": "^4.3.11",
     "@types/eslint": "^8.56.2",
     "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.16",
+    "browserify": "^17.0.0",
     "chai": "^4.4.1",
+    "chalk": "^4.1.2",
+    "esm": "^3.2.25",
+    "hasher-apis": "^0.2.7",
+    "jasmine": "^5.1.0",
+    "jasmine-browser-runner": "^2.3.0",
+    "jasmine-core": "^5.1.2",
+    "jsdom": "^23.2.0",
     "live-server": "^1.2.2",
     "mocha": "^10.2.0",
     "pre-commit": "^1.2.2",
     "pre-push": "^0.1.4",
-    "sinon": "^17.0.1",
-    "typescript": "^5.3.3",
-    "uglify-js": "^3.17.4",
-    "unimported": "^1.31.1",
-    "browserify": "^17.0.0",
-    "chalk": "^4.1.2",
-    "esm": "^3.2.25",
-    "jsdom": "^23.2.0",
     "react": "^18.2.0",
     "react-cookie": "^7.0.0",
     "react-cookies": "^0.1.1",
     "shared-cookies": "^0.0.4",
+    "sinon": "^17.0.1",
     "toughcookies": "^4.1.4",
+    "typescript": "^5.3.3",
+    "uglify-js": "^3.17.4",
+    "unimported": "^1.31.1",
     "universal-cookie-express": "^7.0.1",
     "web-storage-express-cookies": "^1.0.1"
   },
